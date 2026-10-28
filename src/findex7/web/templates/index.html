@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8">
+    <div class="text-center space-y-2">
+        <h1 class="text-3xl font-bold tracking-tight text-white">Search the Index</h1>
+        <p class="text-sm text-slate-400">Lightning-fast BM25 / TF-IDF document retrieval.</p>
+    </div>
+
+    <!-- Search Form -->
+    <form action="/" method="get" class="relative">
+        <div class="flex gap-2">
+            <div class="relative flex-grow">
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ query|default('') }}"
+                    placeholder="Type to search documents..."
+                    required
+                    autofocus
+                    autocomplete="off"
+                    hx-get="/search-partial"
+                    hx-target="#search-results"
+                    hx-trigger="keyup changed delay:250ms, search"
+                    hx-include="[name='scorer'], [name='k']"
+                    class="w-full bg-slate-900 border border-slate-800 rounded-lg px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all font-mono text-sm"
+                >
+            </div>
+            <select name="scorer" hx-get="/search-partial" hx-target="#search-results" hx-include="[name='q'], [name='k']" class="bg-slate-900 border border-slate-800 rounded-lg px-3 py-3 text-sm text-slate-300 font-mono focus:outline-none focus:border-cyan-500">
+                <option value="bm25" {% if scorer == 'bm25' %}selected{% endif %}>BM25</option>
+                <option value="tfidf" {% if scorer == 'tfidf' %}selected{% endif %}>TF-IDF</option>
+            </select>
+            <button type="submit" class="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold px-5 py-3 rounded-lg text-sm transition-colors">
+                Search
+            </button>
+        </div>
+        <input type="hidden" name="k" value="10">
+    </form>
+
+    <!-- Results Container (Updated via htmx or full render) -->
+    <div id="search-results" class="space-y-4">
+        {% include "partials/results.html" %}
+    </div>
+</div>
+{% endblock %}
